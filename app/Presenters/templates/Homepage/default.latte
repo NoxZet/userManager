@@ -1,0 +1,10 @@
+{block content}
+<h1 n:block=title>Home page</h1>
+
+{if $isEmpty}
+    <p>There are no users.</p>
+    <p><a n:href="User:create">Create first user.</a></p>
+{else}
+    <p><a n:href="Log:in">Log in.</a></p>
+{/if}
+{/block}
