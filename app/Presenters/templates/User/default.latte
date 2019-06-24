@@ -1,0 +1,17 @@
+{block content}
+<h2 n:block=title>List of users</h2>
+
+<p><a n:href="Log:out">Log out</a></p>
+
+<table>
+{foreach $users as $row}
+<tr class="usersRow">
+    <td>{$row->name}</td>
+    <td><a href="{link User:edit $row->id}">Edit</a></td>
+    <td><a href="{link User:delete $row->id}">Remove</a></td>
+</tr>
+{/foreach}
+</table>
+
+<a n:href="User:create">Create new user</a>
+{/block}
