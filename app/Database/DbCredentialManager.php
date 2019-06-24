@@ -29,7 +29,7 @@ class DbCredentialManager implements Nette\Security\IAuthenticator
             throw new Nette\Security\AuthenticationException('Invalid password');
         }
 
-        return new Nette\Security\Identity($row->id, [], ['username' => $row->name]);
+        return new Nette\Security\Identity($row->id, [], ['name' => $row->name]);
     }
     
     /**
@@ -77,7 +77,14 @@ class DbCredentialManager implements Nette\Security\IAuthenticator
      * @return bool True if user with the given id exists, false otherwise
      */
     public function userExists(string $searchName): bool {
-        return $this->database->table('users')->where('name', $searchName)->fetch() ? true : false;
+        return $this->database->table('users')->where('name', $searchName)->count() > 0;
+    }
+    
+    public function isIdentityValid(Nette\Security\Identity $identity) {
+        return $this->database->table('users')
+            ->where('name', $identity->name)
+            ->where('id', $identity->id)
+            ->count() > 0;
     }
     
     /**
@@ -86,6 +93,7 @@ class DbCredentialManager implements Nette\Security\IAuthenticator
      * @param string $name New name, if length is 0, no change occurs
      * @param string $newPass New password, if length is 0, change occurs
      * @throws App\Database\IdInvalidException If there is no user with the given id
+     * @throws App\Database\NameTakenException If the new name is already taken
      */
     public function changeCredentials(int $id, string $name, string $newPass): void {
         $row = $this->database->table('users')->get($id);
@@ -98,15 +106,19 @@ class DbCredentialManager implements Nette\Security\IAuthenticator
         // Only modify if length of either is non-zero
         // if the name is same as before, don't modify (save unnecessary db access if there is no change)
         if ($name !== $row->name && strlen($name) > 0) {
-            $values["name"] = $name;
+            $values['name'] = $name;
         }
         if (strlen($newPass) > 0) {
-            $values["pass"] = $this->passwords->hash($newPass);
+            $values['pass'] = $this->passwords->hash($newPass);
         }
         if (count($values) < 1) {
             return;
         }
         
+        // If change of name is requested and other user already has that name, throw an exception
+        if (isset($values["name"]) && $this->userExists($values["name"])) {
+            throw new NameTakenException('User with name '.$values["name"].' already exists');
+        }
         $row->update($values);
     }
     
@@ -128,11 +140,11 @@ class DbCredentialManager implements Nette\Security\IAuthenticator
      * Creates user with given credentials
      * @param string $name Name of the created user
      * @param string $pass Password of the created user
-     * @throws App\Database\UserCreateException If the name is already taken
+     * @throws App\Database\NameTakenException If the name is already taken
      */
     public function userCreate(string $name, string $pass): void {
         if ($this->userExists($name)) {
-            throw new UserCreateException('User with name '.$name.' already exists');
+            throw new NameTakenException('User with name '.$name.' already exists');
         }
         
         $this->database->table('users')->insert(['name' => $name, 'pass' => $this->passwords->hash($pass)]);
