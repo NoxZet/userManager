@@ -3,6 +3,9 @@
 
 <p><a n:href="Homepage:">Back</a></p>
 <p>Leave field empty for no change</p>
+{if $editId == $userId}
+    <p>Changing your own name or deleting your own account will log you out</p>
+{/if}
 
 {control editUserForm}
 {/block}

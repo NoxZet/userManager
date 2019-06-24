@@ -1,0 +1,29 @@
+body, input {
+    font-family: Verdana;
+    font-size: 15px;
+}
+
+table.usersTable {
+    border-collapse: collapse;
+}
+
+table.usersTable td {
+    border: solid black 1px;
+    padding: 2px 4px;
+}
+
+input {
+    background-color: #e8e8e8;
+    border: 1px solid black;
+    display: inline-block;
+    color: black;
+    padding: 2px 4px;
+}
+
+input[type=submit] {
+    cursor: pointer;
+}
+
+input[type=submit]:hover {
+    background-color: #d0d0d0;
+}

@@ -4,5 +4,5 @@ declare(strict_types=1);
 
 namespace App\Database;
 
-class UserCreateException extends \Exception {
+class NameTakenException extends \Exception {
 }

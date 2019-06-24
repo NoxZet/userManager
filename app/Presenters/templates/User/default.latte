@@ -3,15 +3,22 @@
 
 <p><a n:href="Log:out">Log out</a></p>
 
-<table>
+<p>Welcome, {$username}</p>
+
+<table class="usersTable">
 {foreach $users as $row}
 <tr class="usersRow">
     <td>{$row->name}</td>
     <td><a href="{link User:edit $row->id}">Edit</a></td>
     <td><a href="{link User:delete $row->id}">Remove</a></td>
+    {if $userId == $row->id}
+        <td>You</td>
+    {else}
+        <td></td>
+    {/if}
 </tr>
 {/foreach}
 </table>
 
-<a n:href="User:create">Create new user</a>
+<p><a n:href="User:create">Create new user</a></p>
 {/block}
